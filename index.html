@@ -1,242 +1,285 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
-  <title>My Website</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Nonton YouTube dengan Upload & Profile</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background-color: #1a1a1a; /* Gelap dominan */
+            color: #ffffff; /* Putih untuk teks */
+        }
+        .container { 
+            max-width: 1000px; 
+            margin: auto; 
+            background: #2c2c2c; /* Gelap dengan sedikit cahaya */
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 0 10px #ff0000; /* Bayangan merah */
+        }
+        .header { 
+            text-align: center; 
+            margin-bottom: 20px; 
+            color: #ff0000; /* Merah untuk header */
+        }
+        .nav { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 20px; 
+        }
+        .nav button { 
+            background: #ff0000; /* Merah dominan */
+            color: #ffffff; /* Putih */
+            border: none; 
+            padding: 10px; 
+            cursor: pointer; 
+            border-radius: 5px; 
+        }
+        .nav button:hover { 
+            background: #cc0000; /* Merah gelap saat hover */
+        }
+        .section { 
+            display: none; 
+        }
+        .active { 
+            display: block; 
+        }
+        .video-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+            gap: 20px; 
+        }
+        .video-item { 
+            background: #333333; /* Gelap */
+            padding: 10px; 
+            border-radius: 5px; 
+            text-align: center; 
+            border: 1px solid #ff0000; /* Border merah */
+        }
+        .video-item iframe { 
+            width: 100%; 
+            height: 200px; 
+        }
+        .like-btn { 
+            background: #ff0000; /* Merah */
+            color: white; 
+            border: none; 
+            padding: 5px 10px; 
+            cursor: pointer; 
+            border-radius: 5px; 
+        }
+        .like-btn.liked { 
+            background: #cc0000; /* Merah gelap */
+        }
+        .comment-section { 
+            margin-top: 10px; 
+        }
+        .comment { 
+            margin-bottom: 5px; 
+            padding: 5px; 
+            background: #444444; /* Gelap */
+            border-radius: 3px; 
+            color: #ffffff; 
+        }
+        input, button, textarea { 
+            margin: 5px; 
+            padding: 10px; 
+            width: calc(100% - 20px); 
+            background: #333333; /* Gelap */
+            color: #ffffff; 
+            border: 1px solid #ff0000; /* Border merah */
+            border-radius: 5px; 
+        }
+        button { 
+            background: #ff0000; /* Merah */
+            cursor: pointer; 
+        }
+        button:hover { 
+            background: #cc0000; /* Merah gelap */
+        }
+        .profile { 
+            text-align: center; 
+        }
+        .profile img { 
+            width: 100px; 
+            height: 100px; 
+            border-radius: 50%; 
+            background: #666666; /* Abu-abu gelap */
+            border: 2px solid #ff0000; /* Border merah */
+        }
+        .profile input[type="file"] { 
+            width: auto; 
+            margin: 10px; 
+        }
+    </style>
 </head>
-
 <body>
-  <!-- Header -->
-  <section id="header">
-    <div class="header container">
-      <div class="nav-bar">
-        <div class="brand">
-          <a href="#hero">
-            <h1><span>D</span>odi <span>S</span>anjaya</h1>
-          </a>
+    <div class="container">
+        <div class="header">
+            <h1>Web Nonton YouTube dengan Upload & Profile</h1>
         </div>
-        <div class="nav-list">
-          <div class="hamburger">
-            <div class="bar"></div>
-          </div>
-          <ul>
-            <li><a href="#hero" data-after="Home">Home</a></li>
-            <li><a href="#services" data-after="Service">Services</a></li>
-            <li><a href="#projects" data-after="Projects">Projects</a></li>
-            <li><a href="#about" data-after="About">About</a></li>
-            <li><a href="#contact" data-after="Contact">Contact</a></li>
-          </ul>
+        
+        <div class="nav">
+            <div>
+                <button onclick="showSection('home')">Home</button>
+                <button onclick="showSection('upload')">Upload Video</button>
+                <button onclick="showSection('profile')">Profile</button>
+            </div>
         </div>
-      </div>
+        
+        <!-- Home Section: Galeri Video -->
+        <div id="home" class="section active">
+            <h2>Galeri Video</h2>
+            <div id="video-gallery" class="video-grid"></div>
+        </div>
+        
+        <!-- Upload Section -->
+        <div id="upload" class="section">
+            <h2>Upload Video dari Link YouTube</h2>
+            <input type="text" id="video-link" placeholder="Masukkan link YouTube" />
+            <input type="text" id="video-title" placeholder="Judul Video" />
+            <input type="text" id="uploader-name" placeholder="Nama Anda (Uploader)" />
+            <button onclick="uploadVideo()">Upload</button>
+        </div>
+        
+        <!-- Profile Section -->
+        <div id="profile" class="section">
+            <h2>Profile</h2>
+            <div class="profile">
+                <img id="profile-pic" src="" alt="Profile Picture" />
+                <input type="file" id="profile-pic-input" accept="image/*" onchange="previewProfilePic()" />
+                <p><strong>Nama:</strong> <span id="profile-username"></span></p>
+                <textarea id="profile-bio" placeholder="Bio..."></textarea>
+                <button onclick="saveProfile()">Save Profile</button>
+            </div>
+        </div>
     </div>
-  </section>
-  <!-- End Header -->
 
+    <script>
+        let videos = JSON.parse(localStorage.getItem('videos')) || [];
+        let profileData = JSON.parse(localStorage.getItem('profileData')) || { username: 'Anonim', bio: '', profilePic: '' };
 
-  <!-- Hero Section  -->
-  <section id="hero">
-    <div class="hero container">
-      <div>
-        <h1>Hello, <span></span></h1>
-        <h1>My Name is <span></span></h1>
-        <h1>Dodi Sanjaya <span></span></h1>
-        <a href="#projects" type="button" class="cta">Portfolio</a>
-      </div>
-    </div>
-  </section>
-  <!-- End Hero Section  -->
+        // Load data on page load
+        window.onload = function() {
+            renderGallery();
+            loadProfile();
+        };
 
-  <!-- Service Section -->
-  <section id="services">
-    <div class="services container">
-      <div class="service-top">
-        <h1 class="section-title">Serv<span>i</span>ces</h1>
-        <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsum deleniti maiores pariatur assumenda quas
-          magni et, doloribus quod voluptate quasi molestiae magnam officiis dolorum, dolor provident atque molestias
-          voluptatum explicabo!</p>
-      </div>
-      <div class="service-bottom">
-        <div class="service-item">
-          <div class="icon"><img src="https://img.icons8.com/bubbles/100/000000/services.png" /></div>
-          <h2>Web Design</h2>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Corporis debitis rerum, magni voluptatem sed
-            architecto placeat beatae tenetur officia quod</p>
-        </div>
-        <div class="service-item">
-          <div class="icon"><img src="https://img.icons8.com/bubbles/100/000000/services.png" /></div>
-          <h2>Web Design</h2>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Corporis debitis rerum, magni voluptatem sed
-            architecto placeat beatae tenetur officia quod</p>
-        </div>
-        <div class="service-item">
-          <div class="icon"><img src="https://img.icons8.com/bubbles/100/000000/services.png" /></div>
-          <h2>Web Design</h2>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Corporis debitis rerum, magni voluptatem sed
-            architecto placeat beatae tenetur officia quod</p>
-        </div>
-        <div class="service-item">
-          <div class="icon"><img src="https://img.icons8.com/bubbles/100/000000/services.png" /></div>
-          <h2>Web Design</h2>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Corporis debitis rerum, magni voluptatem sed
-            architecto placeat beatae tenetur officia quod</p>
-        </div>
-      </div>
-    </div>
-  </section>
-  <!-- End Service Section -->
+        // Show section
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+        }
 
-  <!-- Projects Section -->
-  <section id="projects">
-    <div class="projects container">
-      <div class="projects-header">
-        <h1 class="section-title">Recent <span>Projects</span></h1>
-      </div>
-      <div class="all-projects">
-        <div class="project-item">
-          <div class="project-info">
-            <h1>Project 1</h1>
-            <h2>Coding is Love</h2>
-            <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ad, iusto cupiditate voluptatum impedit unde
-              rem ipsa distinctio illum quae mollitia ut, accusantium eius odio ducimus illo neque atque libero non sunt
-              harum? Ipsum repellat animi, fugit architecto voluptatum odit et!</p>
-          </div>
-          <div class="project-img">
-            <img src="./img/img-1.png" alt="img">
-          </div>
-        </div>
-        <div class="project-item">
-          <div class="project-info">
-            <h1>Project 2</h1>
-            <h2>Coding is Love</h2>
-            <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ad, iusto cupiditate voluptatum impedit unde
-              rem ipsa distinctio illum quae mollitia ut, accusantium eius odio ducimus illo neque atque libero non sunt
-              harum? Ipsum repellat animi, fugit architecto voluptatum odit et!</p>
-          </div>
-          <div class="project-img">
-            <img src="./img/img-1.png" alt="img">
-          </div>
-        </div>
-        <div class="project-item">
-          <div class="project-info">
-            <h1>Project 3</h1>
-            <h2>Coding is Love</h2>
-            <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ad, iusto cupiditate voluptatum impedit unde
-              rem ipsa distinctio illum quae mollitia ut, accusantium eius odio ducimus illo neque atque libero non sunt
-              harum? Ipsum repellat animi, fugit architecto voluptatum odit et!</p>
-          </div>
-          <div class="project-img">
-            <img src="./img/img-1.png" alt="img">
-          </div>
-        </div>
-        <div class="project-item">
-          <div class="project-info">
-            <h1>Project 4</h1>
-            <h2>Coding is Love</h2>
-            <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ad, iusto cupiditate voluptatum impedit unde
-              rem ipsa distinctio illum quae mollitia ut, accusantium eius odio ducimus illo neque atque libero non sunt
-              harum? Ipsum repellat animi, fugit architecto voluptatum odit et!</p>
-          </div>
-          <div class="project-img">
-            <img src="./img/img-1.png" alt="img">
-          </div>
-        </div>
-        <div class="project-item">
-          <div class="project-info">
-            <h1>Project 5</h1>
-            <h2>Coding is Love</h2>
-            <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ad, iusto cupiditate voluptatum impedit unde
-              rem ipsa distinctio illum quae mollitia ut, accusantium eius odio ducimus illo neque atque libero non sunt
-              harum? Ipsum repellat animi, fugit architecto voluptatum odit et!</p>
-          </div>
-          <div class="project-img">
-            <img src="./img/img-1.png" alt="img">
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-  <!-- End Projects Section -->
+        // Upload Video
+        function uploadVideo() {
+            const link = document.getElementById('video-link').value;
+            const title = document.getElementById('video-title').value;
+            const uploader = document.getElementById('uploader-name').value || 'Anonim';
+            const videoId = extractVideoId(link);
+            if (videoId && title) {
+                const video = { id: videoId, title, user: uploader, likes: 0, comments: [] };
+                videos.push(video);
+                localStorage.setItem('videos', JSON.stringify(videos));
+                renderGallery();
+                showSection('home');
+            } else {
+                alert('Link atau judul tidak valid!');
+            }
+        }
 
-  <!-- About Section -->
-  <section id="about">
-    <div class="about container">
-      <div class="col-left">
-        <div class="about-img">
-          <img src="./img/img-2.png" alt="img">
-        </div>
-      </div>
-      <div class="col-right">
-        <h1 class="section-title">About <span>me</span></h1>
-        <h2>Front End Developer</h2>
-        <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Asperiores, velit alias eius non illum beatae atque
-          repellat ratione qui veritatis repudiandae adipisci maiores. At inventore necessitatibus deserunt
-          exercitationem cumque earum omnis ipsum rem accusantium quis, quas quia, accusamus provident suscipit magni!
-          Expedita sint ad dolore, commodi labore nihil velit earum ducimus nulla quae nostrum fugit aut, deserunt
-          reprehenderit libero enim!</p>
-        <a href="#" class="cta">Download Resume</a>
-      </div>
-    </div>
-  </section>
-  <!-- End About Section -->
+        // Extract Video ID
+        function extractVideoId(url) {
+            const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:.*v=|.*\/|.*embed\/|.*v\/))([^&\n?#]+)/);
+            return match ? match[1] : null;
+        }
 
-  <!-- Contact Section -->
-  <section id="contact">
-    <div class="contact container">
-      <div>
-        <h1 class="section-title">Contact <span>info</span></h1>
-      </div>
-      <div class="contact-items">
-        <div class="contact-item">
-          <div class="icon"><img src="https://img.icons8.com/bubbles/100/000000/phone.png" /></div>
-          <div class="contact-info">
-            <h1>Phone</h1>
-            <h2>+82 234 123 1234</h2>
-            <h2>+82 234 123 1234</h2>
-          </div>
-        </div>
-        <div class="contact-item">
-          <div class="icon"><img src="https://img.icons8.com/bubbles/100/000000/new-post.png" /></div>
-          <div class="contact-info">
-            <h1>Email</h1>
-            <h2>info@gmail.com</h2>
-            <h2>abcd@gmail.com</h2>
-          </div>
-        </div>
-        <div class="contact-item">
-          <div class="icon"><img src="https://img.icons8.com/bubbles/100/000000/map-marker.png" /></div>
-          <div class="contact-info">
-            <h1>Address</h1>
-            <h2>Medan, Sumatera Utara, Indonesia</h2>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-  <!-- End Contact Section -->
+        // Render Gallery
+        function renderGallery() {
+            const gallery = document.getElementById('video-gallery');
+            gallery.innerHTML = '';
+            videos.forEach((video, index) => {
+                const div = document.createElement('div');
+                div.className = 'video-item';
+                div.innerHTML = `
+                    <h3>${video.title}</h3>
+                    <iframe src="https://www.youtube.com/embed/${video.id}" allowfullscreen></iframe>
+                    <p>Uploaded by: ${video.user}</p>
+                    <button class="like-btn" onclick="toggleLike(${index})">Like (${video.likes})</button>
+                    <div class="comment-section">
+                        <input type="text" id="comment-${index}" placeholder="Komentar..." />
+                        <input type="text" id="comment-user-${index}" placeholder="Nama Anda" />
+                        <button onclick="addComment(${index})">Kirim</button>
+                        <div id="comments-${index}"></div>
+                    </div>
+                `;
+                gallery.appendChild(div);
+                renderComments(index);
+            });
+        }
 
-  <!-- Footer -->
-  <section id="footer">
-    <div class="footer container">
-      <div class="brand">
-        <h1><span>D</span>odi <span>S</span>anjaya</h1>
-      </div>
-      <h2>Your Complete Web Solution</h2>
-      <div class="social-icon">
-        <div class="social-item">
-          <a href="#"><img src="https://img.icons8.com/bubbles/100/000000/facebook-new.png" /></a>
-        </div>
-        <div class="social-item">
-          <a href="#"><img src="https://img.icons8.com/bubbles/100/000000/instagram-new.png" /></a>
-        </div>
-      </div>
-      <p>Copyright © 2023 Dodi Sanjaya. All rights reserved</p>
-    </div>
-  </section>
-  <!-- End Footer -->
-  <script src="./app.js"></script>
+        // Toggle Like
+        function toggleLike(index) {
+            videos[index].likes += 1; // Sederhana, tanpa toggle per user
+            localStorage.setItem('videos', JSON.stringify(videos));
+            renderGallery();
+        }
+
+        // Add Comment
+        function addComment(index) {
+            const commentText = document.getElementById(`comment-${index}`).value;
+            const commentUser = document.getElementById(`comment-user-${index}`).value || 'Anonim';
+            if (commentText) {
+                videos[index].comments.push({ user: commentUser, text: commentText });
+                localStorage.setItem('videos', JSON.stringify(videos));
+                document.getElementById(`comment-${index}`).value = '';
+                document.getElementById(`comment-user-${index}`).value = '';
+                renderComments(index);
+            }
+        }
+
+        // Render Comments
+        function renderComments(index) {
+            const commentsDiv = document.getElementById(`comments-${index}`);
+            commentsDiv.innerHTML = '';
+            videos[index].comments.forEach(comment => {
+                const div = document.createElement('div');
+                div.className = 'comment';
+                div.textContent = `${comment.user}: ${comment.text}`;
+                commentsDiv.appendChild(div);
+            });
+        }
+
+        // Load Profile
+        function loadProfile() {
+            document.getElementById('profile-username').textContent = profileData.username;
+            document.getElementById('profile-bio').value = profileData.bio || '';
+            document.getElementById('profile-pic').src = profileData.profilePic || '';
+        }
+
+        // Preview Profile Pic
+        function previewProfilePic() {
+            const file = document.getElementById('profile-pic-input').files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profile-pic').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Save Profile
+        function saveProfile() {
+            profileData.username = document.getElementById('profile-username').textContent || 'Anonim';
+            profileData.bio = document.getElementById('profile-bio').value;
+            profileData.profilePic = document.getElementById('profile-pic').src;
+            localStorage.setItem('profileData', JSON.stringify(profileData));
+            alert('Profile disimpan!');
+        }
+    </script>
 </body>
-
 </html>
