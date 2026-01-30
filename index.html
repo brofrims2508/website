@@ -4,26 +4,61 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web Nonton YouTube dengan Upload & Profile</title>
+    <!-- Tambahkan Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics.js";
+
+        // Konfigurasi Firebase Anda
+        const firebaseConfig = {
+            apiKey: "AIzaSyCJtv7Z28pvkfIELMGHXfoWbRmlOkke6to",
+            authDomain: "data-website-c484f.firebaseapp.com",
+            projectId: "data-website-c484f",
+            storageBucket: "data-website-c484f.firebasestorage.app",
+            messagingSenderId: "502574768028",
+            appId: "1:502574768028:web:8a4cfc2888ab5c26ea3259",
+            measurementId: "G-8GMJ5TEFWG"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        window.db = db;
+        window.storage = storage;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.getDocs = getDocs;
+        window.doc = doc;
+        window.updateDoc = updateDoc;
+        window.ref = ref;
+        window.uploadBytes = uploadBytes;
+        window.getDownloadURL = getDownloadURL;
+    </script>
     <style>
+        /* CSS sama seperti sebelumnya */
         body { 
             font-family: Arial, sans-serif; 
             margin: 0; 
             padding: 20px; 
-            background-color: #1a1a1a; /* Gelap dominan */
-            color: #ffffff; /* Putih untuk teks */
+            background-color: #1a1a1a; 
+            color: #ffffff; 
         }
         .container { 
             max-width: 1000px; 
             margin: auto; 
-            background: #2c2c2c; /* Gelap dengan sedikit cahaya */
+            background: #2c2c2c; 
             padding: 20px; 
             border-radius: 8px; 
-            box-shadow: 0 0 10px #ff0000; /* Bayangan merah */
+            box-shadow: 0 0 10px #ff0000; 
         }
         .header { 
             text-align: center; 
             margin-bottom: 20px; 
-            color: #ff0000; /* Merah untuk header */
+            color: #ff0000; 
         }
         .nav { 
             display: flex; 
@@ -31,15 +66,15 @@
             margin-bottom: 20px; 
         }
         .nav button { 
-            background: #ff0000; /* Merah dominan */
-            color: #ffffff; /* Putih */
+            background: #ff0000; 
+            color: #ffffff; 
             border: none; 
             padding: 10px; 
             cursor: pointer; 
             border-radius: 5px; 
         }
         .nav button:hover { 
-            background: #cc0000; /* Merah gelap saat hover */
+            background: #cc0000; 
         }
         .section { 
             display: none; 
@@ -53,18 +88,18 @@
             gap: 20px; 
         }
         .video-item { 
-            background: #333333; /* Gelap */
+            background: #333333; 
             padding: 10px; 
             border-radius: 5px; 
             text-align: center; 
-            border: 1px solid #ff0000; /* Border merah */
+            border: 1px solid #ff0000; 
         }
         .video-item iframe { 
             width: 100%; 
             height: 200px; 
         }
         .like-btn { 
-            background: #ff0000; /* Merah */
+            background: #ff0000; 
             color: white; 
             border: none; 
             padding: 5px 10px; 
@@ -72,7 +107,7 @@
             border-radius: 5px; 
         }
         .like-btn.liked { 
-            background: #cc0000; /* Merah gelap */
+            background: #cc0000; 
         }
         .comment-section { 
             margin-top: 10px; 
@@ -80,7 +115,7 @@
         .comment { 
             margin-bottom: 5px; 
             padding: 5px; 
-            background: #444444; /* Gelap */
+            background: #444444; 
             border-radius: 3px; 
             color: #ffffff; 
         }
@@ -88,17 +123,17 @@
             margin: 5px; 
             padding: 10px; 
             width: calc(100% - 20px); 
-            background: #333333; /* Gelap */
+            background: #333333; 
             color: #ffffff; 
-            border: 1px solid #ff0000; /* Border merah */
+            border: 1px solid #ff0000; 
             border-radius: 5px; 
         }
         button { 
-            background: #ff0000; /* Merah */
+            background: #ff0000; 
             cursor: pointer; 
         }
         button:hover { 
-            background: #cc0000; /* Merah gelap */
+            background: #cc0000; 
         }
         .profile { 
             text-align: center; 
@@ -107,8 +142,8 @@
             width: 100px; 
             height: 100px; 
             border-radius: 50%; 
-            background: #666666; /* Abu-abu gelap */
-            border: 2px solid #ff0000; /* Border merah */
+            background: #666666; 
+            border: 2px solid #ff0000; 
         }
         .profile input[type="file"] { 
             width: auto; 
@@ -159,11 +194,13 @@
     </div>
 
     <script>
-        let videos = JSON.parse(localStorage.getItem('videos')) || [];
-        let profileData = JSON.parse(localStorage.getItem('profileData')) || { username: 'Anonim', bio: '', profilePic: '' };
+        let videos = [];
+        let profileData = { username: 'Anonim', bio: '', profilePic: '' };
 
-        // Load data on page load
-        window.onload = function() {
+        // Load data from Firebase on page load
+        window.onload = async function() {
+            await loadVideosFromFirebase();
+            await loadProfileFromFirebase();
             renderGallery();
             loadProfile();
         };
@@ -174,20 +211,44 @@
             document.getElementById(sectionId).classList.add('active');
         }
 
-        // Upload Video
-        function uploadVideo() {
+        // Upload Video to Firebase
+        async function uploadVideo() {
             const link = document.getElementById('video-link').value;
             const title = document.getElementById('video-title').value;
             const uploader = document.getElementById('uploader-name').value || 'Anonim';
             const videoId = extractVideoId(link);
             if (videoId && title) {
-                const video = { id: videoId, title, user: uploader, likes: 0, comments: [] };
-                videos.push(video);
-                localStorage.setItem('videos', JSON.stringify(videos));
-                renderGallery();
-                showSection('home');
+                try {
+                    await addDoc(collection(window.db, 'videos'), {
+                        id: videoId,
+                        title,
+                        user: uploader,
+                        likes: 0,
+                        comments: []
+                    });
+                    alert('Video berhasil di-upload!');
+                    await loadVideosFromFirebase();
+                    renderGallery();
+                    showSection('home');
+                } catch (error) {
+                    console.error('Error uploading video:', error);
+                    alert('Gagal upload video.');
+                }
             } else {
                 alert('Link atau judul tidak valid!');
+            }
+        }
+
+        // Load Videos from Firebase
+        async function loadVideosFromFirebase() {
+            try {
+                const querySnapshot = await getDocs(collection(window.db, 'videos'));
+                videos = [];
+                querySnapshot.forEach((doc) => {
+                    videos.push({ ...doc.data(), docId: doc.id });
+                });
+            } catch (error) {
+                console.error('Error loading videos:', error);
             }
         }
 
@@ -208,44 +269,56 @@
                     <h3>${video.title}</h3>
                     <iframe src="https://www.youtube.com/embed/${video.id}" allowfullscreen></iframe>
                     <p>Uploaded by: ${video.user}</p>
-                    <button class="like-btn" onclick="toggleLike(${index})">Like (${video.likes})</button>
+                    <button class="like-btn" onclick="toggleLike('${video.docId}', ${index})">Like (${video.likes})</button>
                     <div class="comment-section">
                         <input type="text" id="comment-${index}" placeholder="Komentar..." />
                         <input type="text" id="comment-user-${index}" placeholder="Nama Anda" />
-                        <button onclick="addComment(${index})">Kirim</button>
+                        <button onclick="addComment('${video.docId}', ${index})">Kirim</button>
                         <div id="comments-${index}"></div>
                     </div>
                 `;
                 gallery.appendChild(div);
-                renderComments(index);
+                renderComments(index, video.comments);
             });
         }
 
         // Toggle Like
-        function toggleLike(index) {
-            videos[index].likes += 1; // Sederhana, tanpa toggle per user
-            localStorage.setItem('videos', JSON.stringify(videos));
-            renderGallery();
+        async function toggleLike(docId, index) {
+            try {
+                const videoRef = doc(window.db, 'videos', docId);
+                const newLikes = videos[index].likes + 1;
+                await updateDoc(videoRef, { likes: newLikes });
+                videos[index].likes = newLikes;
+                renderGallery();
+            } catch (error) {
+                console.error('Error liking video:', error);
+            }
         }
 
         // Add Comment
-        function addComment(index) {
+        async function addComment(docId, index) {
             const commentText = document.getElementById(`comment-${index}`).value;
             const commentUser = document.getElementById(`comment-user-${index}`).value || 'Anonim';
             if (commentText) {
-                videos[index].comments.push({ user: commentUser, text: commentText });
-                localStorage.setItem('videos', JSON.stringify(videos));
-                document.getElementById(`comment-${index}`).value = '';
-                document.getElementById(`comment-user-${index}`).value = '';
-                renderComments(index);
+                try {
+                    const videoRef = doc(window.db, 'videos', docId);
+                    const newComments = [...videos[index].comments, { user: commentUser, text: commentText }];
+                    await updateDoc(videoRef, { comments: newComments });
+                    videos[index].comments = newComments;
+                    document.getElementById(`comment-${index}`).value = '';
+                    document.getElementById(`comment-user-${index}`).value = '';
+                    renderComments(index, newComments);
+                } catch (error) {
+                    console.error('Error adding comment:', error);
+                }
             }
         }
 
         // Render Comments
-        function renderComments(index) {
+        function renderComments(index, comments) {
             const commentsDiv = document.getElementById(`comments-${index}`);
             commentsDiv.innerHTML = '';
-            videos[index].comments.forEach(comment => {
+            comments.forEach(comment => {
                 const div = document.createElement('div');
                 div.className = 'comment';
                 div.textContent = `${comment.user}: ${comment.text}`;
@@ -253,11 +326,17 @@
             });
         }
 
-        // Load Profile
-        function loadProfile() {
-            document.getElementById('profile-username').textContent = profileData.username;
-            document.getElementById('profile-bio').value = profileData.bio || '';
-            document.getElementById('profile-pic').src = profileData.profilePic || '';
+        // Load Profile from Firebase
+        async function loadProfileFromFirebase() {
+            try {
+                const querySnapshot = await getDocs(collection(window.db, 'profiles'));
+                if (!querySnapshot.empty) {
+                    const doc = querySnapshot.docs[0]; // Asumsikan satu profile global
+                    profileData = doc.data();
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+            }
         }
 
         // Preview Profile Pic
@@ -272,13 +351,40 @@
             }
         }
 
-        // Save Profile
-        function saveProfile() {
+        // Save Profile to Firebase
+        async function saveProfile() {
             profileData.username = document.getElementById('profile-username').textContent || 'Anonim';
             profileData.bio = document.getElementById('profile-bio').value;
-            profileData.profilePic = document.getElementById('profile-pic').src;
-            localStorage.setItem('profileData', JSON.stringify(profileData));
-            alert('Profile disimpan!');
+            const file = document.getElementById('profile-pic-input').files[0];
+            if (file) {
+                try {
+                    const storageRef = ref(window.storage, `profile-pics/${file.name}`);
+                    await uploadBytes(storageRef, file);
+                    profileData.profilePic = await getDownloadURL(storageRef);
+                } catch (error) {
+                    console.error('Error uploading image:', error);
+                }
+            }
+            try {
+                const querySnapshot = await getDocs(collection(window.db, 'profiles'));
+                if (!querySnapshot.empty) {
+                    const docRef = doc(window.db, 'profiles', querySnapshot.docs[0].id);
+                    await updateDoc(docRef, profileData);
+                } else {
+                    await addDoc(collection(window.db, 'profiles'), profileData);
+                }
+                alert('Profile disimpan!');
+                loadProfile();
+            } catch (error) {
+                console.error('Error saving profile:', error);
+            }
+        }
+
+        // Load Profile
+        function loadProfile() {
+            document.getElementById('profile-username').textContent = profileData.username;
+            document.getElementById('profile-bio').value = profileData.bio || '';
+            document.getElementById('profile-pic').src = profileData.profilePic || '';
         }
     </script>
 </body>
